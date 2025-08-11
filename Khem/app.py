@@ -222,23 +222,60 @@ except ImportError:
 # ===========================
 # Model loading and prediction functions
 # ===========================
+
+
+# @st.cache_resource
+# def load_model():
+#     """Load the trained model with error handling"""
+#     try:
+#         model_files = [
+#             ("xgb_model.pkl", "pickle"),
+#             ("model.pkl", "pickle"),
+#             ("insurance_model.pkl", "pickle")
+#         ]
+        
+#         if XGBOOST_AVAILABLE:
+#             model_files.extend([
+#                 ("xgb_model.json", "json"),
+#                 ("model.json", "json")
+#             ])
+        
+#         for file_path, file_type in model_files:
+#             if os.path.exists(file_path):
+#                 if file_type == "pickle":
+#                     with open(file_path, "rb") as file:
+#                         model = pickle.load(file)
+#                     return model, "pickle", file_path
+#                 elif file_type == "json" and XGBOOST_AVAILABLE:
+#                     model = xgb.Booster()
+#                     model.load_model(file_path)
+#                     return model, "json", file_path
+        
+#         st.error("❌ Model file not found!")
+#         return None, None, None
+        
+#     except Exception as e:
+#         st.error(f"Error loading model: {str(e)}")
+#         return None, None, None
+
+
 @st.cache_resource
 def load_model():
-    """Load the trained model with error handling"""
     try:
+        BASE_DIR = os.path.dirname(__file__)
         model_files = [
             ("xgb_model.pkl", "pickle"),
             ("model.pkl", "pickle"),
             ("insurance_model.pkl", "pickle")
         ]
-        
         if XGBOOST_AVAILABLE:
             model_files.extend([
                 ("xgb_model.json", "json"),
                 ("model.json", "json")
             ])
         
-        for file_path, file_type in model_files:
+        for filename, file_type in model_files:
+            file_path = os.path.join(BASE_DIR, filename)
             if os.path.exists(file_path):
                 if file_type == "pickle":
                     with open(file_path, "rb") as file:
@@ -248,10 +285,10 @@ def load_model():
                     model = xgb.Booster()
                     model.load_model(file_path)
                     return model, "json", file_path
-        
+
         st.error("❌ Model file not found!")
         return None, None, None
-        
+
     except Exception as e:
         st.error(f"Error loading model: {str(e)}")
         return None, None, None
